@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class AudioService extends Service
-             implements MediaRecorder.OnInfoListener {
+        implements MediaRecorder.OnInfoListener {
     private static final String LOG_TAG = "AudioRecordTest";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static String mFileName = null;
@@ -29,7 +29,7 @@ public class AudioService extends Service
 
     private File mOutputFile;
     private long mStartTime;
-    private MediaPlayer   mPlayer = null;
+    private MediaPlayer mPlayer = null;
 
     @Override
     public void onCreate() {
@@ -37,12 +37,12 @@ public class AudioService extends Service
         // Record to the external cache directory for visibility
         mFileName = getExternalCacheDir().getAbsolutePath();
         mFileName += "/audiorecordtest.3gp";
-        Log.d("filename",mFileName);
+        Log.d("filename", mFileName);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags,
-            int startId) {
+                              int startId) {
         super.onStartCommand(intent, flags, startId);
         return Service.START_STICKY;
     }
@@ -68,7 +68,6 @@ public class AudioService extends Service
         mPlayer.release();
         mPlayer = null;
     }
-
 
 
     @Override
@@ -122,7 +121,7 @@ public class AudioService extends Service
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("Recording","Stopped");
+        Log.d("Recording", "Stopped");
         stopRecording(true);
         if (mRecorder != null) {
             mRecorder.release();
@@ -136,4 +135,4 @@ public class AudioService extends Service
     }
 
 
-  }
+}

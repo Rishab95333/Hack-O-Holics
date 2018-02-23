@@ -3,4 +3,9 @@
     <string name="action_settings">Settings</string>
     <string name="record_sample">Record \n Sample</string>
     <string name="action_clear">Clear</string>
+    <string name="natural_language_understanding_username">84e01ff0-7e8f-4499-ab1d-78dca72ca5f5</string>
+    <string name="natural_language_understanding_password">V5hxuuKEw71u</string>
+    <string name="action_processing">ProcessLanguage</string>
+
+
 </resources>

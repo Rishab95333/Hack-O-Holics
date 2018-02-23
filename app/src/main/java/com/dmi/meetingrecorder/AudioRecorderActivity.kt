@@ -64,7 +64,7 @@ class AudioRecorderActivity : AppCompatActivity() {
             }
         })
 
-        Speech.init(this, getPackageName());
+        Speech.init(this, getPackageName())
     }
 
     private fun getFileName() {
@@ -189,7 +189,6 @@ class AudioRecorderActivity : AppCompatActivity() {
         } catch (exc: GoogleVoiceTypingDisabledException) {
             Log.e("speech", "Google voice typing must be enabled!")
         }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
