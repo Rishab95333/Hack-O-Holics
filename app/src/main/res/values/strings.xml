@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MeetingRecorder</string>
     <string name="action_settings">Settings</string>
+    <string name="record_sample">Record \n Sample</string>
 </resources>

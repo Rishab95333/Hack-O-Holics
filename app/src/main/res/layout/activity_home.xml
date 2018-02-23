@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <include
+            android:id="@+id/toolbar_view"
+            layout="@layout/view_toolbar"></include>
+
+
+    <ImageView
+            android:id="@+id/record_icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/start_record_icon"
+            android:layout_marginTop="30dp"
+          />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start"
+                android:layout_below="@+id/record_icon"
+                android:textSize="30sp"
+                android:layout_marginTop="10dp"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:textStyle="bold"/>
+
+</LinearLayout>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="20dp"
+            android:paddingBottom="30dp"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp">
+        <Button
+                android:id="@+id/record_sample_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/button_selector"
+                android:text="@string/record_sample"
+                android:elevation="5dp"
+                />
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/button_selector"
+                android:text="Start"
+                android:elevation="5dp"
+                />
+    </RelativeLayout>
+</RelativeLayout>
