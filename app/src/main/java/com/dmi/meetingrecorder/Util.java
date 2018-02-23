@@ -1,5 +1,6 @@
 package com.dmi.meetingrecorder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
@@ -30,5 +31,10 @@ public class Util {
         }
         byte[] bbytes = baos.toByteArray();
         return bbytes;
+    }
+
+    public static void shareOnMail(Context context, String path)
+    {
+
     }
 }

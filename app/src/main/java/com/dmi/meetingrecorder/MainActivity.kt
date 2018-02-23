@@ -20,6 +20,14 @@ import com.ibm.watson.developer_cloud.speech_to_text.v1.model.RecognizeOptions
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults
 import com.ibm.watson.developer_cloud.speech_to_text.v1.websocket.BaseRecognizeCallback
 import kotlinx.android.synthetic.main.activity_main.*
+import android.R.attr.path
+import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import com.dmi.meetingrecorder.summarize.SummarizationActivity
+import java.io.File
+import java.io.FileOutputStream
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -32,11 +40,27 @@ class MainActivity : AppCompatActivity() {
     lateinit var dialogConversationList: ArrayList<DialogConversation>
     lateinit var dialogAdapter: DialogAdapter
     var isFirst = true
+    var path = ""
+    var fileName = ""
+    var meetingName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        if (savedInstanceState == null) {
+            val extras = intent.extras
+            if (extras == null) {
+                meetingName = ""
+            } else {
+                meetingName = extras.getString("MeetingName")
+            }
+        } else {
+            meetingName = savedInstanceState.getSerializable("MeetingName") as String
+        }
+        fileName = meetingName + ".txt"
+
         //Setup Recycler view
         linearLayoutManager = LinearLayoutManager(this)
         recyclerView = findViewById(R.id.recyclerView)
@@ -50,6 +74,10 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = dialogAdapter
 
         microphoneHelper = MicrophoneHelper(this)
+
+        recordMessage()
+
+        path = Environment.getExternalStorageDirectory().toString();
 
         fab.setOnClickListener { view ->
             recordMessage()
@@ -103,6 +131,15 @@ class MainActivity : AppCompatActivity() {
                 dialogAdapter.notifyDataSetChanged()
                 return true
             }
+            R.id.action_stop -> {
+                if (listening) {
+                    //if listening stop recording
+                    recordMessage()
+                }
+
+                makeMinutesOfMeeting()
+                return true
+            }
             else -> {
                 super.onOptionsItemSelected(item)
 
@@ -110,6 +147,45 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun makeMinutesOfMeeting() {
+        var conversation = ""
+        var summary = ""
+        for (dialogConversation in dialogConversationList) {
+            conversation = conversation + dialogConversation.speaker + ": " + dialogConversation.message + "\n"
+            summary = summary + dialogConversation.message + "."
+        }
+
+        var intent = Intent(baseContext, SummarizationActivity::class.java)
+        intent.putExtra("conversation",conversation)
+        intent.putExtra("text", summary)
+        intent.putExtra("fileName", fileName)
+        intent.putExtra("meetingName", meetingName)
+        intent.putExtra("path", path)
+
+        startActivity(intent)
+
+//        val file = File(path, fileName)
+//        val stream = FileOutputStream(file)
+//        try {
+//            stream.write(conversation.toByteArray())
+//        } finally {
+//            stream.close()
+//        }
+//
+//        shareOnMail(file)
+    }
+
+    private fun shareOnMail(file: File) {
+        var emailIntent = Intent(Intent.ACTION_SEND);
+        emailIntent.setType("*/*");
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("swati90.cdac@gmail.com"));
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+                meetingName + " Notes");
+        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                "Please find the summary and detailed conversation below");
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+        startActivity(emailIntent)
+    }
 
     private fun enableMicButton() {
         runOnUiThread {
@@ -143,15 +219,15 @@ class MainActivity : AppCompatActivity() {
             var speakerLabelString = ""
             recoTokens = SpeakerLabelDiarization.RecoTokens()
             if (speechResults!!.speakerLabels != null) {
-                var finalPosition=0;
+                var finalPosition = 0;
                 for (count in 1 until speechResults.speakerLabels.size) {
-                    if(speechResults.speakerLabels[0].confidence < speechResults.speakerLabels[count].confidence){
-                        finalPosition==count;
+                    if (speechResults.speakerLabels[0].confidence < speechResults.speakerLabels[count].confidence) {
+                        finalPosition == count;
                     }
                 }
 
                 recoTokens!!.add(speechResults)
-                speakerLabelString = "Speaker " + speechResults!!.speakerLabels[finalPosition].speaker
+                speakerLabelString = "Spk " + speechResults!!.speakerLabels[finalPosition].speaker
                 Log.i("SpeechResults", speechResults.speakerLabels[finalPosition].toString())
                 if (speakerLabelString == null)
                     speakerLabelString = ""

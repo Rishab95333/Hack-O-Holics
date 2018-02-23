@@ -3,6 +3,7 @@ package com.dmi.meetingrecorder.summarize;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -26,6 +27,9 @@ import com.google.api.services.translate.TranslateRequestInitializer;
 import com.google.api.services.translate.model.TranslationsListResponse;
 import com.squareup.okhttp.OkHttpClient;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -49,21 +53,26 @@ public class SummarizationActivity extends Activity {
     TextView summarizedTextView;
     TextToSpeech ttobj;
     boolean ttStatus = false;
-    Button btnPlay;
+    Button btnPlay, btnSend;
     SummarizedTextModel summarizedTextModel;
+    String conversation, meetingName, fileName, path;
+    final int LINE_NO = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summarization);
         summarizedTextView = (TextView) findViewById(R.id.summarizedTextView);
         btnPlay = (Button) findViewById(R.id.btnPlay);
-        String text;
-        if(getIntent().getExtras() != null) {
+        btnSend = (Button) findViewById(R.id.btnSendMail);
+        String text = "";
+        if (getIntent().getExtras() != null) {
             text = getIntent().getExtras().getString("text", "");
+            conversation = getIntent().getExtras().getString("conversation", "");
+            fileName = getIntent().getExtras().getString("fileName", "");
+            meetingName = getIntent().getExtras().getString("meetingName", "");
+            path = getIntent().getExtras().getString("path", "");
         }
-
-
-        text="Voice recognition software on computers requires that analog audio be converted into digital signals, known as analog-to-digital conversion. For a computer to decipher a signal, it must have a digital database, or vocabulary, of words or syllables, as well as a speedy means for comparing this data to signals. ";
 
 //        if(isTranslateType){
 //            String translatedText = getIntent().getExtras().getString("translatedText");
@@ -81,7 +90,7 @@ public class SummarizationActivity extends Activity {
 ////            }
 //        }
 
-        ttobj=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        ttobj = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 ttStatus = true;
@@ -93,33 +102,90 @@ public class SummarizationActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (ttStatus) {
-                            String text = summarizedTextView.getText().toString();
-                            if (text != null && text.length() > 0) {
-                                ttobj.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                            }
+                    String text = summarizedTextView.getText().toString();
+                    if (text != null && text.length() > 0) {
+                        ttobj.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 } else {
                     Toast.makeText(SummarizationActivity.this, "Some issue in intializing voice setting. Please check your internet setting", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+        btnSend.setEnabled(false);
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendMail();
 
-        (new SummarizeDocumentsTask(SummarizationActivity.this, text, 4)).execute();
+            }
+        });
+
+        (new SummarizeDocumentsTask(SummarizationActivity.this, text, LINE_NO)).execute();
+    }
+
+    private void sendMail() {
+        File fileConversation = new File(path, fileName);
+        FileOutputStream stream = null;
+        try {
+            stream = new FileOutputStream(fileConversation);
+            stream.write(conversation.getBytes());
+            stream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+        }
+
+        File fileSummary = new File(path, meetingName + "summary.txt");
+        FileOutputStream streamSummary = null;
+        try {
+            streamSummary = new FileOutputStream(fileSummary);
+            streamSummary.write(conversation.getBytes());
+            streamSummary.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+        }
+
+        shareOnMail(fileConversation, fileSummary, meetingName);
+    }
+
+    private void shareOnMail(File fileConversation, File fileSummary, String meetingName) {
+        Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        emailIntent.setType("*/*");
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"swati90.cdac@gmail.com"});
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+                meetingName + " Notes");
+        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                "Please find the summary and detailed conversation below");
+        ArrayList<Uri> uris = new ArrayList<Uri>();
+        Uri uriConversation = Uri.fromFile(fileConversation);
+        uris.add(uriConversation);
+        Uri uriSummary = Uri.fromFile(fileSummary);
+        uris.add(uriSummary);
+        emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+        startActivity(emailIntent);
     }
 
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(ttobj != null){
+        if (ttobj != null) {
             try {
                 ttobj.stop();
-            }catch (Exception er)
-            {
+            } catch (Exception er) {
                 er.printStackTrace();
             }
         }
     }
-
 
 
     protected class SummarizeDocumentsTask extends AsyncTask<Void, Integer, Integer> {
@@ -158,11 +224,12 @@ public class SummarizationActivity extends Activity {
             if (summarizedTextModel != null) {
 //                SummarizedTextModel summarizedTextModel = (SummarizedTextModel) getIntent().getSerializableExtra("summarizedText");
 //                if (summarizedTextModel != null) {
-                    String text = "";
-                    for (String eachString : summarizedTextModel.getSentences()) {
-                        text = text + Html.fromHtml(eachString) + "  \r\n\r\n";
-                    }
-                    summarizedTextView.setText(text);
+                String text = "";
+                for (String eachString : summarizedTextModel.getSentences()) {
+                    text = text + Html.fromHtml(eachString) + "  \r\n\r\n";
+                }
+                summarizedTextView.setText(text);
+                btnSend.setEnabled(true);
             }
 //                }
         }
@@ -231,4 +298,4 @@ public class SummarizationActivity extends Activity {
             throw new RuntimeException(e);
         }
     }
-    }
+}

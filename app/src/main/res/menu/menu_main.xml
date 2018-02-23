@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.dmi.meetingrecorder.MainActivity">
+
     <item
         android:id="@+id/action_clear"
         android:orderInCategory="100"
@@ -13,4 +14,11 @@
         android:orderInCategory="101"
         android:title="@string/action_processing"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_stop"
+        android:orderInCategory="100"
+        android:title="@string/action_stop"
+        app:showAsAction="never" />
+
 </menu>

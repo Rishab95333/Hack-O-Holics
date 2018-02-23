@@ -27,7 +27,7 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:text="Start"
+            android:text="Start Meeting"
             android:textSize="30sp"
             android:textStyle="bold" />
 
