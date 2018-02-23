@@ -1,11 +1,16 @@
 package com.dmi.meetingrecorder
 
 import AlizeSpkRec.SimpleSpkDetSystem
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.MediaPlayer
+import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -17,9 +22,7 @@ import net.gotev.speech.Speech
 import net.gotev.speech.GoogleVoiceTypingDisabledException
 import net.gotev.speech.SpeechRecognitionNotAvailable
 import net.gotev.speech.SpeechDelegate
-
-
-
+import java.io.IOException
 
 
 /**
@@ -29,15 +32,25 @@ import net.gotev.speech.SpeechDelegate
 class AudioRecorderActivity : AppCompatActivity() {
 
     lateinit var mSimpleSpkDetection: SimpleSpkDetSystem
-
     var mCurrentSpeaker = 0
+    private val LOG_TAG = "AudioRecordTest"
+    private val REQUEST_RECORD_AUDIO_PERMISSION = 200
+    private var mFileName: String? = null
 
+    private var mRecorder: MediaRecorder? = null
+    private var mPlayer: MediaPlayer? = null
+
+    // Requesting permission to RECORD_AUDIO
+    private var permissionToRecordAccepted = false
+    private val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
     var mModelsArray = arrayOf("Ankit", "Swati", "Pooja", "Karan")
-
+    var count = 0
+    var isRecording = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recorder)
         setSupportActionBar(findViewById(R.id.toolbar))
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
         Handler().postDelayed(object : Runnable {
             override fun run() {
                 initialiseAliZe()
@@ -46,12 +59,18 @@ class AudioRecorderActivity : AppCompatActivity() {
         }, 500)
         fab.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
-                recordAudio()
-                startVoiceToTextRecognition();
+//                recordAudio()
+                startVoiceToTextRecognition()
             }
         })
 
         Speech.init(this, getPackageName());
+    }
+
+    private fun getFileName() {
+        mFileName = externalCacheDir!!.absolutePath
+        mFileName += "/meeting" + count + "1.3gp"
+        count++
     }
 
     private fun recordAudio() {
@@ -112,9 +131,6 @@ class AudioRecorderActivity : AppCompatActivity() {
     }
 
 
-
-
-
     /// speech to text
     protected override fun onDestroy() {
         super.onDestroy();
@@ -124,12 +140,16 @@ class AudioRecorderActivity : AppCompatActivity() {
 
     lateinit var mRecognizedText: FirebaseMessageConversationObject;
 
-    protected fun startVoiceToTextRecognition(){
+    protected fun startVoiceToTextRecognition() {
         try {
             // you must have android.permission.RECORD_AUDIO granted at this point
             Speech.getInstance().startListening(object : SpeechDelegate {
                 override fun onStartOfSpeech() {
                     Log.i("speech", "speech recognition is now active")
+                    if (isRecording) {
+                        stopRecording()
+                    }
+                    startRecording()
                 }
 
                 override fun onSpeechRmsChanged(value: Float) {
@@ -146,34 +166,16 @@ class AudioRecorderActivity : AppCompatActivity() {
                 }
 
                 override fun onSpeechResult(result: String) {
-                    if(result == null || result.length <= 0)
+                    if (result == null || result.length <= 0)
                         return;
                     Log.i("speech-result", "result: " + result)
-
-//                    var index1 = result.indexOf("Over");
-//                    var index2 = result.indexOf("over");
-//                    var index3 = result.indexOf("OVER");
-//
-//                    if(index1 >= 0 || index2 >= 0 || index3 >= 0){
-//                        var position=-1;
-//                        if(index1 >= 0){
-//                            position = index1;
-//                        }else if(index2 >= 0){
-//                            position = index2;
-//                        } else if(index3 >= 0){
-//                            position = index3;
-//                        }
-//                        if(position > 0) {
-//                            mRecognizedText.message = mRecognizedText.message + result.substring(0, position)
-//                            Toast.makeText(baseContext,mRecognizedText.message,Toast.LENGTH_SHORT)
-//                        }
                     Speech.getInstance().shutdown();
                     Speech.init(baseContext, getPackageName());
-                        startVoiceToTextRecognition();
-                        // save conversation on server
-
-                        // initialize speaker recognition again
-//                    }
+                    if (result.toLowerCase().endsWith("over")) {
+                        stopRecording()
+                        startRecording()
+                    }
+                    startVoiceToTextRecognition();
                 }
             })
         } catch (exc: SpeechRecognitionNotAvailable) {
@@ -189,5 +191,46 @@ class AudioRecorderActivity : AppCompatActivity() {
         }
 
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_RECORD_AUDIO_PERMISSION -> permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED
+        }
+        if (!permissionToRecordAccepted) finish()
+    }
+
+    private fun startRecording() {
+        isRecording = true
+        getFileName()
+        mRecorder = MediaRecorder()
+        mRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
+        mRecorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+        mRecorder?.setOutputFile(mFileName)
+        mRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+
+        try {
+            mRecorder?.prepare()
+        } catch (e: IOException) {
+            Log.e(LOG_TAG, "prepare() failed")
+        }
+        mRecorder?.start()
+    }
+
+    private fun stopRecording() {
+        isRecording = false
+        mRecorder?.stop()
+        mRecorder?.release()
+        mRecorder = null
+    }
+
+    public override fun onStop() {
+        super.onStop()
+        if (mRecorder != null) {
+            mRecorder?.release()
+            mRecorder = null
+        }
+    }
+
 }
 

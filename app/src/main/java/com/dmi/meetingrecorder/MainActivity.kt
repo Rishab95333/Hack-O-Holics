@@ -1,6 +1,5 @@
 package com.dmi.meetingrecorder
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DialogTitle
@@ -32,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private var microphoneHelper: MicrophoneHelper? = null
     lateinit var dialogConversationList: ArrayList<DialogConversation>
     lateinit var dialogAdapter: DialogAdapter
+    var isFirst = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,17 +52,17 @@ class MainActivity : AppCompatActivity() {
         microphoneHelper = MicrophoneHelper(this)
 
         fab.setOnClickListener { view ->
-            // recordMessage()
-            startActivity(Intent(this, AudioRecorderActivity::class.java))
+            recordMessage()
         }
     }
 
     //Record a message via Watson Speech to Text
     private fun recordMessage() {
         speechService = SpeechToText()
-        speechService!!.setUsernameAndPassword("<UserName>", "<Password>")
+        speechService!!.setUsernameAndPassword("fe2a111e-931b-4043-b1b0-b629d5eb5456", "Bo6qfsomMvuV")
 
         if (!listening) {
+            fab.setImageResource(android.R.drawable.ic_media_pause)
             capture = microphoneHelper?.getInputStream(true)
             Thread(Runnable {
                 try {
@@ -73,7 +73,6 @@ class MainActivity : AppCompatActivity() {
             }).start()
             listening = true
             Toast.makeText(this@MainActivity, "Listening....Click to Stop", Toast.LENGTH_LONG).show()
-
 
         } else {
             try {
@@ -97,15 +96,26 @@ class MainActivity : AppCompatActivity() {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
         return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
+            R.id.action_clear -> {
+                dialogConversationList.clear()
+                dialogAdapter.notifyDataSetChanged()
+                return true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+
+            }
         }
     }
 
 
     private fun enableMicButton() {
-        runOnUiThread { fab.setEnabled(true) }
+        runOnUiThread {
+            fab.setEnabled(true)
+            fab.setImageResource(android.R.drawable.ic_media_play)
+        }
     }
 
     private fun showError(e: Exception) {
@@ -119,7 +129,7 @@ class MainActivity : AppCompatActivity() {
     private fun getRecognizeOptions(): RecognizeOptions {
         return RecognizeOptions.Builder()
                 .contentType(ContentType.OPUS.toString())
-                .model("en-UK_NarrowbandModel")
+//                .model("en-UK_NarrowbandModel")
                 .interimResults(true)
                 .inactivityTimeout(2000)
                 .speakerLabels(true)
@@ -130,17 +140,31 @@ class MainActivity : AppCompatActivity() {
 
         override fun onTranscription(speechResults: SpeechResults?) {
             println(speechResults)
+            var speakerLabelString = ""
             recoTokens = SpeakerLabelDiarization.RecoTokens()
             if (speechResults!!.speakerLabels != null) {
                 recoTokens!!.add(speechResults)
+                speakerLabelString = "Speaker " + speechResults!!.speakerLabels[0].speaker
                 Log.i("SpeechResults", speechResults.speakerLabels[0].toString())
+                if (speakerLabelString == null)
+                    speakerLabelString = ""
+                var text = dialogConversationList.get(dialogConversationList.size - 1).dialog
+                dialogConversationList.get(dialogConversationList.size - 1).dialog = speakerLabelString + " " + text
             }
 
             if (speechResults.results != null && !speechResults.results.isEmpty()) {
-                val text = speechResults.results[0].alternatives[0].transcript
-                var dialogConversation = DialogConversation()
-                dialogConversation.dialog = text
-                dialogConversationList.add(dialogConversation)
+                var text = speechResults.results[0].alternatives[0].transcript
+
+                if (isFirst) {
+                    isFirst = false
+                    var dialogConversation = DialogConversation()
+                    dialogConversation.dialog = text
+                    dialogConversationList.add(dialogConversation)
+                } else {
+                    dialogConversationList.get(dialogConversationList.size - 1).dialog = text
+                }
+                if (speechResults.results[0].isFinal)
+                    isFirst = true
                 runOnUiThread(Runnable { dialogAdapter.notifyDataSetChanged() })
             }
         }
