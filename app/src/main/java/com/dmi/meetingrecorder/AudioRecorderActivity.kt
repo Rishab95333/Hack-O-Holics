@@ -3,16 +3,12 @@ package com.dmi.meetingrecorder
 import AlizeSpkRec.SimpleSpkDetSystem
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import kotlinx.android.synthetic.main.activity_recorder.*
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileInputStream
 import java.io.InputStream
 
 /**
@@ -22,6 +18,10 @@ import java.io.InputStream
 class AudioRecorderActivity : AppCompatActivity() {
 
     lateinit var mSimpleSpkDetection: SimpleSpkDetSystem
+
+    var mCurrentSpeaker = 0
+
+    var mModelsArray = arrayOf("Ankit", "Swati", "Pooja", "Karan")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,19 +49,15 @@ class AudioRecorderActivity : AppCompatActivity() {
         when (requestCode) {
             1000 -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    System.out.println("File Name Retrieved: " + data?.data)
-                    val uri: Uri = data?.data!!
-                    System.out.print("Audio file: " + uri.path)
-                    mSimpleSpkDetection.addAudio(Util.getByteArrayFromUri(data))
-                    mSimpleSpkDetection.createSpeakerModel("Ankit")
-                    System.out.println("System status:");
-                    System.out.println("  # of features: " + mSimpleSpkDetection.featureCount())  // at this point, 0
-                    System.out.println("  # of models: " + mSimpleSpkDetection.speakerCount())
+                    mSimpleSpkDetection.resetAudio()
+                    mSimpleSpkDetection.resetFeatures()
+                    if (data != null) {
+                        createSpeakerModel()
+                    }
                 }
             }
         }
     }
-
 
     private fun initialiseAliZe() {
         val inputStream: InputStream = getApplicationContext().getAssets().open("MeetingRecorder.cfg")
@@ -76,6 +72,29 @@ class AudioRecorderActivity : AppCompatActivity() {
         System.out.println("  # of features: " + mSimpleSpkDetection.featureCount())  // at this point, 0
         System.out.println("  # of models: " + mSimpleSpkDetection.speakerCount())   // at this point, 0
         System.out.println("  UBM is loaded: " + mSimpleSpkDetection.isUBMLoaded())    // true
+    }
+
+    private fun checkIfVoiceMatches(data: Intent): Boolean {
+        var mIsMatched = false
+        mSimpleSpkDetection.addAudio(Util.getByteArrayFromUri(data))
+        for (i in 0..mModelsArray.size) {
+            val speakerResult = mSimpleSpkDetection.verifySpeaker(mModelsArray[i])
+            System.out.println("Speaker's match score base " + speakerResult.score.toString())
+            mIsMatched = speakerResult.match
+        }
+        return mIsMatched
+    }
+
+    private fun createSpeakerModel() {
+        if (mCurrentSpeaker <= 3) {
+            mSimpleSpkDetection.createSpeakerModel(mModelsArray.get(mCurrentSpeaker))
+            mSimpleSpkDetection.resetAudio()
+            mSimpleSpkDetection.resetFeatures()
+            mCurrentSpeaker++
+            System.out.println("System status:")
+            System.out.println("  # of features: " + mSimpleSpkDetection.featureCount())  // at this point, 0
+            System.out.println("  # of models: " + mSimpleSpkDetection.speakerCount())
+        }
     }
 }
 
