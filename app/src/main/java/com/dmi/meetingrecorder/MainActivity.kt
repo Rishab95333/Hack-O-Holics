@@ -176,6 +176,7 @@ class MainActivity : AppCompatActivity() {
                     isFirst = true
                 runOnUiThread(Runnable { dialogAdapter.notifyDataSetChanged() })
             }
+//            recyclerView.scrollToPosition(dialogAdapter.itemCount - 1);
         }
 
         override fun onConnected() {
