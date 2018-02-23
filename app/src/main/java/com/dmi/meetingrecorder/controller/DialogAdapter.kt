@@ -32,7 +32,42 @@ public class DialogAdapter : RecyclerView.Adapter<DialogAdapter.DialogHolder>() 
         lateinit var dialogConversation: DialogConversation
         fun bindConversation(dialogConversation: DialogConversation) {
             this.dialogConversation = dialogConversation
-            itemView.textView.text = dialogConversation.dialog
+            itemView.textViewSpeaker.text = dialogConversation.speaker
+            itemView.textViewMessage.text = dialogConversation.message
+            if(dialogConversation.speaker.contains("0")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker1)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message1)
+            } else if(dialogConversation.speaker.contains("1")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker2)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message2)
+            } else if(dialogConversation.speaker.contains("2")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker3)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message3)
+            } else if(dialogConversation.speaker.contains("3")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker4)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message4)
+            } else if(dialogConversation.speaker.contains("4")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker5)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message5)
+            } else if(dialogConversation.speaker.contains("5")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker6)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message6)
+            } else if(dialogConversation.speaker.contains("6")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker7)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message7)
+            } else if(dialogConversation.speaker.contains("7")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker8)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message8)
+            } else if(dialogConversation.speaker.contains("8")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker9)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message9)
+            } else if(dialogConversation.speaker.contains("9")){
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker10)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message10)
+            } else{
+                itemView.textViewSpeaker.setBackgroundResource(R.drawable.speaker1)
+                itemView.textViewMessage.setBackgroundResource(R.drawable.message1)
+            }
         }
     }
 }

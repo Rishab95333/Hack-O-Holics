@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textViewSpeaker"
+        android:padding="10dp"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:background="@drawable/speaker1"/>
+
+    <TextView
+        android:id="@+id/textViewMessage"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/message1"
+        android:layout_toRightOf="@id/textViewSpeaker"
         android:text="TextView" />
-</LinearLayout>
+</RelativeLayout>

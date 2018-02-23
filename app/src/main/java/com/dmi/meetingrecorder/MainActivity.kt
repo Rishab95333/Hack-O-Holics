@@ -143,13 +143,22 @@ class MainActivity : AppCompatActivity() {
             var speakerLabelString = ""
             recoTokens = SpeakerLabelDiarization.RecoTokens()
             if (speechResults!!.speakerLabels != null) {
+                var finalPosition=0;
+                for (count in 1 until speechResults.speakerLabels.size) {
+                    if(speechResults.speakerLabels[0].confidence < speechResults.speakerLabels[count].confidence){
+                        finalPosition==count;
+                    }
+                }
+
                 recoTokens!!.add(speechResults)
-                speakerLabelString = "Speaker " + speechResults!!.speakerLabels[0].speaker
-                Log.i("SpeechResults", speechResults.speakerLabels[0].toString())
+                speakerLabelString = "Speaker " + speechResults!!.speakerLabels[finalPosition].speaker
+                Log.i("SpeechResults", speechResults.speakerLabels[finalPosition].toString())
                 if (speakerLabelString == null)
                     speakerLabelString = ""
-                var text = dialogConversationList.get(dialogConversationList.size - 1).dialog
-                dialogConversationList.get(dialogConversationList.size - 1).dialog = speakerLabelString + " " + text
+                var text = dialogConversationList.get(dialogConversationList.size - 1).message
+//                dialogConversationList.get(dialogConversationList.size - 1).dialog = speakerLabelString + " " + text
+                dialogConversationList.get(dialogConversationList.size - 1).message = text
+                dialogConversationList.get(dialogConversationList.size - 1).speaker = speakerLabelString
             }
 
             if (speechResults.results != null && !speechResults.results.isEmpty()) {
@@ -158,10 +167,10 @@ class MainActivity : AppCompatActivity() {
                 if (isFirst) {
                     isFirst = false
                     var dialogConversation = DialogConversation()
-                    dialogConversation.dialog = text
+                    dialogConversation.message = text
                     dialogConversationList.add(dialogConversation)
                 } else {
-                    dialogConversationList.get(dialogConversationList.size - 1).dialog = text
+                    dialogConversationList.get(dialogConversationList.size - 1).message = text
                 }
                 if (speechResults.results[0].isFinal)
                     isFirst = true

@@ -5,7 +5,8 @@ package com.dmi.meetingrecorder.model
  */
 public class DialogConversation {
 
-    var dialog: String = ""
+    var speaker: String = ""
+    var message: String = ""
 
 
 }
