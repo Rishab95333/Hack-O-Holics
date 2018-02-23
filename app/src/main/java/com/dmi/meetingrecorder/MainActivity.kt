@@ -1,8 +1,10 @@
 package com.dmi.meetingrecorder
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DialogTitle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -12,6 +14,7 @@ import android.widget.Toast
 import com.dmi.meetingrecorder.controller.DialogAdapter
 import com.dmi.meetingrecorder.controller.SpeakerLabelDiarization
 import com.dmi.meetingrecorder.model.DialogConversation
+import com.dmi.meetingrecorder.summarize.SummarizationActivity
 import com.ibm.watson.developer_cloud.android.library.audio.MicrophoneHelper
 import com.ibm.watson.developer_cloud.android.library.audio.MicrophoneInputStream
 import com.ibm.watson.developer_cloud.android.library.audio.utils.ContentType
@@ -20,13 +23,7 @@ import com.ibm.watson.developer_cloud.speech_to_text.v1.model.RecognizeOptions
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults
 import com.ibm.watson.developer_cloud.speech_to_text.v1.websocket.BaseRecognizeCallback
 import kotlinx.android.synthetic.main.activity_main.*
-import android.R.attr.path
-import android.content.Intent
-import android.net.Uri
-import android.os.Environment
-import com.dmi.meetingrecorder.summarize.SummarizationActivity
 import java.io.File
-import java.io.FileOutputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -131,13 +128,16 @@ class MainActivity : AppCompatActivity() {
                 dialogAdapter.notifyDataSetChanged()
                 return true
             }
+
             R.id.action_stop -> {
                 if (listening) {
                     //if listening stop recording
                     recordMessage()
                 }
-
                 makeMinutesOfMeeting()
+                return true
+            }
+            R.id.action_processing -> {
                 return true
             }
             else -> {
@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         var intent = Intent(baseContext, SummarizationActivity::class.java)
-        intent.putExtra("conversation",conversation)
+        intent.putExtra("conversation", conversation)
         intent.putExtra("text", summary)
         intent.putExtra("fileName", fileName)
         intent.putExtra("meetingName", meetingName)
