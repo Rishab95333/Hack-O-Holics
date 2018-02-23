@@ -3,6 +3,9 @@ package com.dmi.meetingrecorder
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.AppCompatTextView
+import android.view.View
+import android.widget.TextView
 import com.ibm.watson.developer_cloud.natural_language_understanding.v1.NaturalLanguageUnderstanding
 import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.AnalyzeOptions
 import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.EntitiesOptions
@@ -15,7 +18,7 @@ import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.Se
  */
 class NLPActivity : AppCompatActivity() {
 
-    private val mDocumentContent = "Hi, my name is Ankit. I live in Delhi. My Hobby is badmintion and I love travelling."
+    private var mDocumentContent = "Hi, my name is Ankit. I live in Delhi. My Hobby is badmintion and I love travelling."
     private var output = ""
 
 
@@ -41,6 +44,11 @@ class NLPActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nlp)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar!!.title = "LanguageProcessing"
+        if (intent.hasExtra("ContentData")) {
+            mDocumentContent = intent.getStringExtra("ContentData")
+        }
         var analyzer = NaturalLanguageUnderstanding(
                 NaturalLanguageUnderstanding.VERSION_DATE_2017_02_27,
                 resources.getString(
@@ -75,7 +83,18 @@ class NLPActivity : AppCompatActivity() {
                         "\n\n"
 
                 System.out.println(output)
+                setText()
             }
         }
+    }
+
+    private fun setText() {
+        runOnUiThread(object : Runnable {
+            override fun run() {
+                var viewText: AppCompatTextView = findViewById<View>(R.id.document_text) as AppCompatTextView
+                viewText.setText(output)
+            }
+
+        })
     }
 }

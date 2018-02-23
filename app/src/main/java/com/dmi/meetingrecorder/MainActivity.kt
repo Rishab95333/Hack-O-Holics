@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     var path = ""
     var fileName = ""
     var meetingName = ""
+    var conversation = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,6 +139,9 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_processing -> {
+                var intent = Intent(this, NLPActivity::class.java)
+                intent.putExtra("ContentData", conversation)
+                startActivity(intent)
                 return true
             }
             else -> {
@@ -148,7 +152,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun makeMinutesOfMeeting() {
-        var conversation = ""
         var summary = ""
         for (dialogConversation in dialogConversationList) {
             conversation = conversation + dialogConversation.speaker + ": " + dialogConversation.message + "\n"
