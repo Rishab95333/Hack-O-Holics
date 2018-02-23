@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 /**
  * Created by Psingh on 2/23/2018.
@@ -19,6 +20,7 @@ import android.widget.Button;
 public class HomeActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private Button mRecordSampleBtn;
+    ImageView mStartMeeting;
     boolean isRecording = false;
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
@@ -34,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mRecordSampleBtn= findViewById(R.id.record_sample_btn);
+        mStartMeeting=findViewById(R.id.record_icon);
 
         ActivityCompat.requestPermissions(HomeActivity.this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
         mRecordSampleBtn.setOnClickListener(new View.OnClickListener() {
@@ -49,8 +52,13 @@ public class HomeActivity extends AppCompatActivity {
                     mRecordSampleBtn.setText(getResources().getString(R.string.record_sample));
                 }
                 isRecording = !isRecording;
+            }
+        });
 
-
+        mStartMeeting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HomeActivity.this, MainActivity.class));
             }
         });
     }
