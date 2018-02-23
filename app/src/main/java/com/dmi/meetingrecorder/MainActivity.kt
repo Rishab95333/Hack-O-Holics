@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         var summary = ""
         for (dialogConversation in dialogConversationList) {
             conversation = conversation + dialogConversation.speaker + ": " + dialogConversation.message + "\n"
-            summary = summary + dialogConversation.message + "."
+            summary = summary + "\n" + dialogConversation.message
         }
 
         var intent = Intent(baseContext, SummarizationActivity::class.java)

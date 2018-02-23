@@ -55,7 +55,7 @@ public class SummarizationActivity extends Activity {
     boolean ttStatus = false;
     Button btnPlay, btnSend;
     SummarizedTextModel summarizedTextModel;
-    String conversation, meetingName, fileName, path;
+    String conversation, meetingName, fileName, path, summarized;
     final int LINE_NO = 2;
 
     @Override
@@ -143,7 +143,7 @@ public class SummarizationActivity extends Activity {
         FileOutputStream streamSummary = null;
         try {
             streamSummary = new FileOutputStream(fileSummary);
-            streamSummary.write(conversation.getBytes());
+            streamSummary.write(summarized.getBytes());
             streamSummary.close();
 
         } catch (FileNotFoundException e) {
@@ -224,11 +224,11 @@ public class SummarizationActivity extends Activity {
             if (summarizedTextModel != null) {
 //                SummarizedTextModel summarizedTextModel = (SummarizedTextModel) getIntent().getSerializableExtra("summarizedText");
 //                if (summarizedTextModel != null) {
-                String text = "";
+                summarized = "";
                 for (String eachString : summarizedTextModel.getSentences()) {
-                    text = text + Html.fromHtml(eachString) + "  \r\n\r\n";
+                    summarized = summarized + Html.fromHtml(eachString) + "  \r\n\r\n";
                 }
-                summarizedTextView.setText(text);
+                summarizedTextView.setText(meetingName + " Summary\n\n" + summarized);
                 btnSend.setEnabled(true);
             }
 //                }
