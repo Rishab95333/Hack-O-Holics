@@ -10,7 +10,7 @@ import retrofit.http.POST;
 import retrofit.http.Query;
 
 /**
- * Created by Karan on 25/2/16.
+ * Created by Rishab on 14/11/19.
  */
 public interface SummarizeAPI {
     @Headers({

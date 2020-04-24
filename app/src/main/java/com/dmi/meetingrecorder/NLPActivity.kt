@@ -13,12 +13,12 @@ import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.Fe
 import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.SentimentOptions
 
 /**
- * Created by ajindal on 2/23/2018.
- * @author Ankit jindal
+ * Created by Rishab on 11/10/2019.
+ * @author Rishab Arora
  */
 class NLPActivity : AppCompatActivity() {
 
-    private var mDocumentContent = "Hi, my name is Ankit. I live in Delhi. My Hobby is badmintion and I love travelling."
+    private var mDocumentContent = "Speaker 0. Speaker 1. speaker 2."
     private var output = ""
 
 
@@ -30,7 +30,6 @@ class NLPActivity : AppCompatActivity() {
     val sentimentOptions = SentimentOptions.Builder()
             .document(true)
             .build()
-
     val features = Features.Builder()
             .entities(entityOptions)
             .sentiment(sentimentOptions)

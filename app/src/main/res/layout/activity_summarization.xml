@@ -46,17 +46,60 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/llBottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         tools:context="com.renard.documentview.SummarizationActivity">
 
-        <TextView
-            android:padding="25dp"
-            android:id="@+id/summarizedTextView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text=""
-            android:textColor="@android:color/primary_text_light"
-            android:textSize="19sp" />
-
     </ScrollView>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="140dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="171dp"
+        android:layout_marginStart="21dp"
+        android:text="KEYWORDS:"
+        android:textAppearance="@style/TextAppearance.AppCompat" />
+
+    <TextView
+        android:id="@+id/summarizedTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:padding="25dp"
+        android:text=' He made the corner shop on the front of the house. And on the sign were these words: The Corner Shop Proprietor: Dav0e %HESITATION. The new assistant in the corner shop was %HESITATION. Sometimes her friend, Peter, helped at the shop. . In the shop was a room where only Dav0e came. On the door of the room notice: "Special Orders Only: Keep Out".on a day a strange woman came to the shop.%HESITATION Her name is Miss Greta Gordon. She was a beautiful woman and she was wearing expensive clothes and we want met Dave Slatin .Dav0e felt pleased to meet her. She had beautiful hands 00and she was wearing beautiful diamond rings. Dave and Miss Greta Gordon disappeared in the Special orders room. When Miss Gordon came out of the Special orders room her eyes were red with tears. But here rings where disappeared. The next months more people came to visit the Special order room'
+        android:textColor="@android:color/primary_text_light"
+        android:textSize="19sp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="215dp"
+        android:layout_height="45dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/textView"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="-5dp"
+        android:text="corner shop, friend, strange woman, expensive clothes" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="140dp"
+        android:layout_height="40dp"
+        android:layout_alignStart="@+id/textView"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="-171dp"
+        android:text="TASK ASSIGNING:" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="215dp"
+        android:layout_height="45dp"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="-171dp"
+        android:layout_toEndOf="@+id/textView"
+        android:text="Spk 0: corner shop, expensive cloths   Spk 1: friend   Spk 2: strange women " />
+
 </RelativeLayout>
